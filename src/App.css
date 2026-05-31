@@ -1,184 +1,645 @@
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
+/* ============================================================
+   0zong Cinema — App.css
+   레퍼런스: 실제 필름 스트립 + 영화관 스크린 + 마키 간판
+   ============================================================ */
 
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Special+Elite&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ── 디자인 토큰 ──────────────────────────────────────────── */
+:root {
+  /* 공간 색상 */
+  --bg:           #080808;
+  --panel-dark:   #0e0e0e;
+  --panel-mid:    #141414;
+  --border:       #222;
+
+  /* 골드 (간판/포인트) */
+  --gold:         #e8b84b;
+  --gold-bright:  #f5c518;
+  --gold-dim:     #a07820;
+  --gold-glow:    rgba(232,184,75,0.25);
+
+  /* 크림/베이지 (티켓/스크린) */
+  --cream:        #f0ead8;
+  --cream-mid:    #e8e0c8;
+
+  /* 빨간 좌석 */
+  --seat-top:     #c0292a;
+  --seat-mid:     #9b1f20;
+  --seat-bot:     #6a1314;
+  --seat-shadow:  #3a0a0b;
+
+  /* 텍스트 */
+  --txt:          #d0cfc8;
+  --txt-dim:      #666;
+
+  /* 필름 */
+  --film-bg:      #111;
+  --film-edge:    #1c1c1c;
+  --perf:         #040404;
+  --perf-border:  #2a2a2a;
+
+  /* 마키 */
+  --marquee-bg:   #1a1408;
+  --marquee-txt:  #c8a030;
 }
 
-.hero {
-  position: relative;
+/* ── 전역 리셋 ────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--txt);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-#center {
+#root {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+input  { font-family: inherit; }
+
+/* ══════════════════════════════════════════════════════════
+   전체 앱 루트
+══════════════════════════════════════════════════════════ */
+.app-root {
+  width: 100vw;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
-
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
-}
-
-#next-steps {
-  display: flex;
-  border-top: 1px solid var(--border);
-  text-align: left;
-
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
-
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
-}
-
-#docs {
-  border-right: 1px solid var(--border);
-
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-}
-
-#next-steps ul {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
-}
-
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
-}
-
-.ticks {
+  overflow: hidden;
   position: relative;
+  background: var(--bg);
+}
+
+/* ── 조명 오버레이 ──────────────────────────────────────── */
+.dim-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 90;
+  background-color: rgba(0,0,0,0);
+}
+
+/* ══════════════════════════════════════════════════════════
+   상단 마키 간판
+══════════════════════════════════════════════════════════ */
+.marquee-header {
+  flex-shrink: 0;
+  background: var(--marquee-bg);
+  border-bottom: 2px solid var(--gold-dim);
+  box-shadow: 0 3px 30px rgba(232,184,75,0.12);
+  position: relative;
+  z-index: 20;
+}
+
+/* ── 흐르는 텍스트 트랙 ──────────────────────────────── */
+.marquee-track {
+  overflow: hidden;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(232,184,75,0.15);
+  background: rgba(0,0,0,0.3);
+}
+
+.bottom-track {
+  border-top: 1px solid rgba(232,184,75,0.15);
+  border-bottom: none;
+}
+
+.marquee-inner {
+  display: flex;
+  white-space: nowrap;
+  animation: marquee-scroll 28s linear infinite;
+  gap: 0;
+}
+
+.marquee-inner.reverse {
+  animation-direction: reverse;
+  animation-duration: 35s;
+}
+
+.marquee-inner span {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  color: var(--marquee-txt);
+  padding-right: 2px;
+  opacity: 0.85;
+}
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ── 중앙 헤더 바 ────────────────────────────────────── */
+.header-main {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 8px 28px;
+  gap: 20px;
+  min-height: 64px;
+}
+
+/* 검색 */
+.search-box {
+  position: relative;
+  justify-self: start;
   width: 100%;
+  max-width: 260px;
+}
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
-  }
+.search-svg {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 15px;
+  height: 15px;
+  color: var(--txt-dim);
+  pointer-events: none;
+}
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
-  }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
-  }
+.search-input {
+  width: 100%;
+  padding: 8px 14px 8px 36px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(232,184,75,0.2);
+  border-radius: 6px;
+  color: var(--txt);
+  font-size: 13px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.search-input::placeholder { color: var(--txt-dim); }
+.search-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(232,184,75,0.1);
+  background: rgba(232,184,75,0.04);
+}
+
+/* 브랜드 타이틀 */
+.brand-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  user-select: none;
+}
+
+.brand-deco {
+  color: var(--gold);
+  font-size: 14px;
+  text-shadow: 0 0 8px var(--gold-glow);
+  line-height: 1;
+}
+
+.brand-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  line-height: 1;
+}
+
+.brand-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(28px, 3.5vw, 46px);
+  letter-spacing: 0.14em;
+  color: var(--gold-bright);
+  text-shadow:
+    0 0 24px rgba(245,197,24,0.5),
+    0 0 50px rgba(245,197,24,0.2),
+    2px 2px 0 rgba(0,0,0,0.6);
+  line-height: 1;
+}
+
+.brand-sub {
+  font-family: 'Special Elite', serif;
+  font-size: 9px;
+  letter-spacing: 0.45em;
+  color: var(--gold-dim);
+  margin-top: 1px;
+}
+
+/* + 추가 버튼 */
+.add-btn {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  background: linear-gradient(135deg, var(--gold-dim), var(--gold), var(--gold-dim));
+  background-size: 200% 100%;
+  border-radius: 6px;
+  color: #1a1000;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+  font-weight: 400;
+  transition: background-position 0.3s, transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 14px rgba(232,184,75,0.35);
+}
+.add-btn:hover {
+  background-position: right center;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(232,184,75,0.55);
+}
+.add-btn:active { transform: translateY(0); }
+
+/* ══════════════════════════════════════════════════════════
+   메인 레이아웃: [필름스트립] [영화관]
+══════════════════════════════════════════════════════════ */
+.main-layout {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ══════════════════════════════════════════════════════════
+   왼쪽 필름 스트립
+══════════════════════════════════════════════════════════ */
+.film-strip-container {
+  width: 116px;
+  flex-shrink: 0;
+  background: var(--film-bg);
+  border-right: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.film-strip-scroll {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 자동 스크롤 트랙 */
+.film-strip-track {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 6px 0;
+  will-change: transform;
+}
+
+/* 필름 한 칸 (구멍 + 포스터 + 구멍) */
+.film-unit {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  height: 128px;
+  border-bottom: 2px solid #0a0a0a;
+  flex-shrink: 0;
+}
+
+/* 구멍 열 */
+.perf-col {
+  width: 18px;
+  flex-shrink: 0;
+  background: var(--film-edge);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 8px 0;
+  gap: 0;
+}
+
+.left-perf  { border-right: 1px solid #0a0a0a; }
+.right-perf { border-left:  1px solid #0a0a0a; }
+
+/* 필름 구멍 (퍼프레이션) - 실제 필름처럼 직사각형 */
+.perf-hole {
+  width: 10px;
+  height: 16px;
+  border-radius: 2px;
+  background: var(--perf);
+  border: 1px solid var(--perf-border);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,0,0,0.5);
+  flex-shrink: 0;
+}
+
+/* 포스터 프레임 */
+.film-poster-frame {
+  flex: 1;
+  background: #0c0c0c;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 1px solid #111;
+  border-right: 1px solid #111;
+  transition: background 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.film-poster-frame:hover { background: #161616; }
+
+/* 포스터 없을 때 플레이스홀더 */
+.poster-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  opacity: 0.22;
+}
+
+.poster-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  color: #888;
+  letter-spacing: 0.05em;
+}
+
+.poster-icon {
+  width: 24px;
+  height: 24px;
+  color: #888;
+}
+
+/* 상하 그라데이션 페이드 */
+.film-fade-top,
+.film-fade-bottom {
+  position: absolute;
+  left: 0; right: 0;
+  height: 60px;
+  pointer-events: none;
+  z-index: 2;
+}
+.film-fade-top    { top: 0;    background: linear-gradient(to bottom, var(--film-bg), transparent); }
+.film-fade-bottom { bottom: 0; background: linear-gradient(to top,   var(--film-bg), transparent); }
+
+/* ══════════════════════════════════════════════════════════
+   가운데 영화관
+══════════════════════════════════════════════════════════ */
+.theater-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background:
+    /* 벽면 질감 */
+    radial-gradient(ellipse at 50% 0%, #1a1410 0%, #0c0c0c 40%, #080808 100%);
+  overflow: hidden;
+  min-width: 0;
+  position: relative;
+}
+
+/* ── 천장 ─────────────────────────────────────────────── */
+.ceiling {
+  height: 56px;
+  background: linear-gradient(180deg, #101010 0%, #0e0e0e 100%);
+  border-bottom: 1px solid #1a1a1a;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10%;
+  padding-bottom: 0;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.ceiling-light {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 천장 조명 빔 */
+.ceiling-beam {
+  position: absolute;
+  top: 0;
+  width: 60px;
+  height: 300px;
+  background: conic-gradient(
+    from 270deg at 50% 0%,
+    transparent 0%,
+    rgba(255,240,200,0.018) 8%,
+    rgba(255,240,200,0.035) 15%,
+    rgba(255,240,200,0.018) 22%,
+    transparent 30%
+  );
+  transform-origin: 50% 0%;
+  transform: rotate(var(--angle, 0deg));
+  pointer-events: none;
+}
+
+.ceiling-bulb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff8e8 0%, #e8c870 60%, #c8a030 100%);
+  box-shadow:
+    0 0 6px 3px rgba(255,240,180,0.5),
+    0 0 20px 6px rgba(255,220,100,0.25);
+  animation: bulb-glow 3s ease-in-out infinite alternate;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes bulb-glow {
+  from { box-shadow: 0 0 6px 3px rgba(255,240,180,0.5), 0 0 20px 6px rgba(255,220,100,0.25); }
+  to   { box-shadow: 0 0 8px 4px rgba(255,240,180,0.7), 0 0 28px 8px rgba(255,220,100,0.35); }
+}
+
+/* ── 스크린 영역 ──────────────────────────────────────── */
+.screen-area {
+  flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+  padding: 0 0 0;
+  /* 스크린이 화면 위쪽에 차지 */
+  height: 42%;
+  min-height: 180px;
+  max-height: 340px;
+}
+
+.wall {
+  flex: 0 0 clamp(20px, 5%, 60px);
+  background: linear-gradient(180deg, #151515 0%, #0f0f0f 100%);
+}
+.left-wall  { border-right: 1px solid #1a1a1a; }
+.right-wall { border-left:  1px solid #1a1a1a; }
+
+.screen-frame-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  /* 스크린 위로 살짝 올라간 테두리 */
+  border-left:   3px solid #555;
+  border-right:  3px solid #555;
+  border-top:    5px solid #3a3a3a;
+  background: #0f0f0f;
+}
+
+/* 스크린 표면 */
+.screen-surface {
+  flex: 1;
+  background: linear-gradient(160deg, #f5f2ea 0%, #ede8dc 50%, #e8e2d4 100%);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 은은한 빛 발산 */
+  box-shadow:
+    0 0 80px rgba(240,235,210,0.1),
+    0 0 160px rgba(240,235,210,0.05),
+    inset 0 0 40px rgba(0,0,0,0.08);
+}
+
+/* 빈 스크린 메시지 */
+.screen-msg {
+  text-align: center;
+  z-index: 2;
+  position: relative;
+}
+.screen-msg-main {
+  font-family: 'Special Elite', serif;
+  font-size: clamp(13px, 2vw, 22px);
+  color: #5a5448;
+  letter-spacing: 0.03em;
+  margin-bottom: 6px;
+}
+.screen-msg-sub {
+  font-size: clamp(10px, 1.2vw, 14px);
+  color: #9a9284;
+  letter-spacing: 0.05em;
+}
+
+/* 영사기 빔 */
+.proj-beam {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% -20%, rgba(255,255,255,0.12) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── 좌석 구역 ────────────────────────────────────────── */
+.seats-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 5px;
+  padding: 14px 12px 10px;
+  overflow: hidden;
+  /* 원근감을 위한 perspective */
+  perspective: 500px;
+}
+
+.seat-row {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  /* 원근감 틸트 */
+  transform: rotateX(var(--rx, 0deg));
+}
+
+/* 각 row마다 살짝 다른 틸트 & 크기 */
+.seat-row:nth-child(1) { --rx: 0deg;  transform: scale(1.0); }
+.seat-row:nth-child(2) { --rx: 0deg;  transform: scale(0.97) translateY(1px); }
+.seat-row:nth-child(3) { --rx: 0deg;  transform: scale(0.94) translateY(2px); }
+.seat-row:nth-child(4) { --rx: 0deg;  transform: scale(0.91) translateY(2px); }
+.seat-row:nth-child(5) { --rx: 0deg;  transform: scale(0.88) translateY(2px); }
+
+.seat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  animation: seat-in 0.5s ease-out both;
+}
+
+@keyframes seat-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.seat-back {
+  width: clamp(20px, 2.8vw, 36px);
+  height: clamp(13px, 1.8vw, 22px);
+  background: linear-gradient(180deg, var(--seat-top) 0%, var(--seat-mid) 100%);
+  border-radius: 3px 3px 0 0;
+  border-top: 1.5px solid rgba(255,80,80,0.18);
+  box-shadow: inset 0 1px 2px rgba(255,100,100,0.1);
+}
+
+.seat-base {
+  width: clamp(22px, 3vw, 38px);
+  height: clamp(7px, 1vw, 13px);
+  background: linear-gradient(180deg, var(--seat-mid), var(--seat-bot));
+  border-radius: 0 0 3px 3px;
+  border-bottom: 1.5px solid var(--seat-shadow);
+}
+
+/* ══════════════════════════════════════════════════════════
+   우하단 조명 버튼
+══════════════════════════════════════════════════════════ */
+.light-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 200;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+
+  padding: 13px 15px 10px;
+  background: rgba(16,12,4,0.88);
+  border: 1.5px solid rgba(232,184,75,0.3);
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 30px rgba(0,0,0,0.6), 0 0 0 1px rgba(232,184,75,0.08);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.light-btn:hover {
+  border-color: var(--gold);
+  box-shadow: 0 6px 36px rgba(0,0,0,0.7), 0 0 24px rgba(232,184,75,0.18);
+}
+
+.light-emoji {
+  font-size: 22px;
+  display: block;
+  line-height: 1;
+  filter: drop-shadow(0 0 5px rgba(232,184,75,0.4));
+}
+
+/* 단계 인디케이터 */
+.level-pips {
+  display: flex;
+  gap: 5px;
+}
+
+.pip {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #333;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.pip.on {
+  background: var(--gold);
+  box-shadow: 0 0 5px var(--gold-glow);
 }

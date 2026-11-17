@@ -24,16 +24,17 @@ export default function RateSheet({ initial, query, onClose, onSaved }) {
     if (!query || initial?.tmdbId) return
     let alive = true
     searchMovies(query).then(async r => {
-      if (!alive || !r[0]) return
+      if (!alive) return
+      if (!r?.[0]) return pick({ title: query })
       const d = await getMovieDetails(r[0].id)
-      if (alive && d) pick(d)
-    })
+      if (alive) pick(d || r[0])
+    }).catch(() => alive && pick({ title: query }))
     return () => { alive = false }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!picking || q.trim().length < 1) return
-    const t = setTimeout(() => searchMovies(q).then(setResults), 300)
+    const t = setTimeout(() => searchMovies(q).then(r => setResults(r || [])).catch(() => setResults([])), 300)
     return () => clearTimeout(t)
   }, [q, picking])
 
@@ -67,6 +68,11 @@ export default function RateSheet({ initial, query, onClose, onSaved }) {
                   <span><b>{m.title}</b><small>{m.year}{m.originalTitle && m.originalTitle !== m.title ? ` · ${m.originalTitle}` : ''}</small></span>
                 </button>
               ))}
+              {q.trim() && (
+                <button className="rs-manual" onClick={() => pick({ title: q.trim() })}>
+                  <span className="ph" /><span><b>'{q.trim()}'(으)로 채점하기</b><small>찾는 영화가 없으면 제목만으로 남겨요</small></span>
+                </button>
+              )}
               {q && !results.length && <p className="rs-hint">검색 결과가 없어요. TMDB 키가 없으면 검색이 안 돼요(설정 탭).</p>}
             </div>
           </>

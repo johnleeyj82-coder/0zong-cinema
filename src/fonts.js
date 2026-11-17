@@ -1,0 +1,5 @@
+import '@fontsource/bebas-neue/400.css'
+import '@fontsource/ibm-plex-mono/400.css'
+import '@fontsource/ibm-plex-sans-kr/400.css'
+import '@fontsource/ibm-plex-sans-kr/500.css'
+import '@fontsource/ibm-plex-sans-kr/700.css'

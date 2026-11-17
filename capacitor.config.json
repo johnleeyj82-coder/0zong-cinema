@@ -1,0 +1,10 @@
+{
+  "appId": "com.zong.cinema",
+  "appName": "CINEDAY",
+  "webDir": "dist",
+  "android": { "allowMixedContent": false },
+  "plugins": {
+    "CapacitorHttp": { "enabled": true },
+    "LocalNotifications": { "iconColor": "#e9b872" }
+  }
+}

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { searchMovies, getMovieDetails, posterUrl } from './tmdb.js'
+import { watchaRaw, watchaCalibrated, starText } from './marathon/watcha.js'
 import './App.css'
 
 /* ═══════════════════════════════════════════════════
@@ -135,8 +136,10 @@ function TmdbSearch({ onSelect }) {
 /* ═══════════════════════════════════════════════════
    티켓 폼 (스크린 내부에 렌더링)
 ═══════════════════════════════════════════════════ */
-function TicketForm({ onClose, onSave }) {
-  const [form, setForm] = useState({ ...EMPTY_FORM })
+export function TicketForm({ onClose, onSave, initial }) {
+  const [form, setForm] = useState({ ...EMPTY_FORM, ...(initial || {}) })
+  const [copied, setCopied] = useState(false)
+  const history = useMemo(() => JSON.parse(localStorage.getItem('0zong-films') || '[]'), [])
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }))
 
   /* 총점 / 별점 자동 계산 */
@@ -157,12 +160,33 @@ function TicketForm({ onClose, onSave }) {
     }))
   }
 
+  /* 마라톤에서 열었을 때: 제목으로 TMDB 정보 자동 채우기 */
+  useEffect(() => {
+    if (!initial?.title) return
+    let alive = true
+    ;(async () => {
+      const r = await searchMovies(initial.title)
+      if (!alive || !r[0]) return
+      const d = await getMovieDetails(r[0].id)
+      if (alive && d) handleMovieSelect(d)
+    })()
+    return () => { alive = false }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* 왓챠피디아 별점 (0.5 단위) */
+  const wRaw = watchaRaw(totalScore)
+  const wCal = watchaCalibrated(totalScore, history)
+  const copyWatcha = async () => {
+    const v = starText(wCal ?? wRaw)
+    try { await navigator.clipboard.writeText(v); setCopied(true); setTimeout(() => setCopied(false), 1400) } catch { setCopied(false) }
+  }
+
   /* 저장 */
   const handleSave = () => {
     if (!form.title) return
     const saved = JSON.parse(localStorage.getItem('0zong-films') || '[]')
     const entry = {
-      ...form, totalScore, starRating: parseFloat(starRating),
+      ...form, totalScore, starRating: parseFloat(starRating), watchaStar: wCal ?? wRaw,
       savedAt: new Date().toISOString(), id: Date.now(),
     }
     saved.unshift(entry)
@@ -264,6 +288,12 @@ function TicketForm({ onClose, onSave }) {
                   <span className="tot-denom"> / 5.0</span>
                 </span>
               </div>
+            </div>
+            <div className="t-watcha">
+              <span className="t-watcha-lbl">WATCHA</span>
+              <span>그대로 <b>★ {starText(wRaw)}</b></span>
+              <span>{wCal != null ? <>내 분포 보정 <b>★ {starText(wCal)}</b></> : <>보정은 기록 10편부터 ({history.length}/10)</>}</span>
+              <button type="button" className="t-watcha-copy" onClick={copyWatcha}>{copied ? '복사했어요' : '별점 복사'}</button>
             </div>
 
             <div className="t-rating-grid">

@@ -6,7 +6,11 @@
 import axios from 'axios'
 
 const BASE   = 'https://api.themoviedb.org/3'
-const KEY    = import.meta.env.VITE_TMDB_KEY
+let KEY      = import.meta.env.VITE_TMDB_KEY
+
+/** 앱 설정에서 입력한 키가 있으면 그걸 써요 */
+export const setTmdbKey = k => { if (k) KEY = k }
+export const hasTmdbKey = () => !!KEY
 const IMG    = 'https://image.tmdb.org/t/p'
 
 /** 포스터 URL 생성 */
@@ -81,6 +85,24 @@ export async function getMovieDetails(movieId) {
     }
   } catch (err) {
     console.error('[TMDB] getMovieDetails 오류:', err)
+    return null
+  }
+}
+
+/**
+ * 마라톤용: 제목으로 첫 결과의 포스터·개봉일만 가져오기
+ * @param {string} title
+ */
+export async function lookupFilm(title) {
+  if (!KEY || !title) return null
+  try {
+    const { data } = await axios.get(`${BASE}/search/movie`, {
+      params: { api_key: KEY, query: title, language: 'ko-KR', region: 'KR', include_adult: false, page: 1 },
+    })
+    const m = (data.results || [])[0]
+    if (!m) return null
+    return { tmdbId: m.id, poster: m.poster_path || null, release: m.release_date || '', original: m.original_title || '' }
+  } catch {
     return null
   }
 }

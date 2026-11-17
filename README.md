@@ -16,7 +16,7 @@ The React Compiler is not enabled on this template because of its impact on dev 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
 
 
-## 마라톤 플래너 + 안드로이드 앱
+## CINEDAY 시네데이 (마라톤 플래너 + 안드로이드 앱)
 
 탭 네 개로 나뉘어요.
 
@@ -30,7 +30,7 @@ If you are developing a production application, we recommend using TypeScript wi
 ### APK 받기
 
 `feat/marathon-app` 또는 `main`에 올리면 GitHub Actions가 APK를 만들어 **Releases**에 올려요.
-휴대폰에서 Releases의 `0zong-cinema.apk`를 받아 설치하면 돼요. 처음 한 번은 "출처를 알 수 없는 앱 설치"를 허용해야 해요.
+휴대폰에서 Releases의 `cineday.apk`를 받아 설치하면 돼요. 처음 한 번은 "출처를 알 수 없는 앱 설치"를 허용해야 해요.
 
 TMDB 키는 저장소 **Settings > Secrets and variables > Actions**에 `TMDB_KEY`로 넣어 두면 앱에 들어가요. 넣지 않았다면 앱의 설정 탭에서 입력해도 돼요.
 `.env`는 더 이상 저장소에 올리지 않아요(`.env.example` 참고).

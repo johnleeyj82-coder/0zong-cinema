@@ -57,7 +57,7 @@ export function drawTicket(c, s, ox, oy, { img, idx, total, rating }) {
   c.strokeStyle = 'rgba(60,45,30,.45)'; c.setLineDash([3, 9]); c.lineWidth = 3; c.beginPath(); c.moveTo(stubX, oy + 28); c.lineTo(stubX, oy + TH - 28); c.stroke(); c.setLineDash([])
 
   const ix = ox + 380
-  c.fillStyle = mute; c.font = "400 20px 'Bebas Neue'"; c.fillText(`0ZONG CINEMA MARATHON   ADMIT ONE   No. ${String(idx + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`, ix, oy + 52)
+  c.fillStyle = mute; c.font = "400 20px 'Bebas Neue'"; c.fillText(`CINEDAY MARATHON   ADMIT ONE   No. ${String(idx + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`, ix, oy + 52)
   c.fillStyle = ink; fit(c, s.title, "700 $px 'IBM Plex Sans KR'", 50, 520, 30); c.fillText(s.title, ix, oy + 112)
   c.fillStyle = shade(color); c.font = "400 26px 'Bebas Neue'"; c.fillText([s.original, s.fmt].filter(Boolean).join('   ').toUpperCase().slice(0, 40), ix, oy + 150)
 
@@ -96,7 +96,7 @@ export async function ticketsCanvas(items, { posterOf, ratingOf, single } = {}) 
   const c = cv.getContext('2d'); c.scale(scale, scale); c.fillStyle = '#15100c'; c.fillRect(0, 0, W, H)
   if (!single) {
     const a = dInfo(items[0].date), b = dInfo(items[items.length - 1].date)
-    c.fillStyle = '#e9b872'; c.font = "400 26px 'Bebas Neue'"; c.fillText(`0ZONG CINEMA MARATHON   ${a.md} - ${b.md}`, pad, pad + 30)
+    c.fillStyle = '#e9b872'; c.font = "400 26px 'Bebas Neue'"; c.fillText(`CINEDAY MARATHON   ${a.md} - ${b.md}`, pad, pad + 30)
     c.fillStyle = '#f3eadb'; c.font = "700 64px 'IBM Plex Sans KR'"; c.fillText('영화관에서 살아보기', pad, pad + 108)
     const tot = items.reduce((x, s) => x + (endOf(s) - s.st), 0)
     c.fillStyle = '#cfc3b1'; c.font = "500 22px 'IBM Plex Sans KR'"; c.fillText(`${items.length}편   ${Math.floor(tot / 60)}시간 ${tot % 60}분   ${new Set(items.map(s => s.theater)).size}개 극장`, pad, pad + 150)
@@ -114,7 +114,7 @@ export async function summaryCanvas(rows, stats) {
   const H = head + rows.length * rowH + pad + 60
   const cv = document.createElement('canvas'); cv.width = W * 2; cv.height = H * 2
   const c = cv.getContext('2d'); c.scale(2, 2); c.fillStyle = '#15100c'; c.fillRect(0, 0, W, H)
-  c.fillStyle = '#e9b872'; c.font = "400 28px 'Bebas Neue'"; c.fillText(`0ZONG CINEMA MARATHON   ${stats.range}`, pad, pad + 20)
+  c.fillStyle = '#e9b872'; c.font = "400 28px 'Bebas Neue'"; c.fillText(`CINEDAY MARATHON   ${stats.range}`, pad, pad + 20)
   c.fillStyle = '#f3eadb'; c.font = "700 66px 'IBM Plex Sans KR'"; c.fillText('마라톤 결산', pad, pad + 100)
   const box = (x, lab, val) => { c.fillStyle = '#1e1712'; rr(c, x, pad + 140, 300, 120, 16); c.fill(); c.fillStyle = '#958a7b'; c.font = "400 20px 'Bebas Neue'"; c.fillText(lab, x + 24, pad + 178); c.fillStyle = '#f3eadb'; c.font = "400 60px 'Bebas Neue'"; c.fillText(val, x + 24, pad + 238) }
   box(pad, 'FILMS', String(stats.films)); box(pad + 320, 'SCREEN TIME', stats.time); box(pad + 640, 'THEATERS', String(stats.theaters))

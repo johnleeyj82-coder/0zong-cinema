@@ -1,6 +1,6 @@
 {
   "appId": "com.zong.cinema",
-  "appName": "0zong Cinema",
+  "appName": "CINEDAY",
   "webDir": "dist",
   "android": { "allowMixedContent": false },
   "plugins": {

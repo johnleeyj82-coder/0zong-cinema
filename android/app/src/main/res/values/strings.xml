@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">0zong Cinema</string>
-    <string name="title_activity_main">0zong Cinema</string>
+    <string name="app_name">CINEDAY</string>
+    <string name="title_activity_main">CINEDAY</string>
     <string name="package_name">com.zong.cinema</string>
     <string name="custom_url_scheme">com.zong.cinema</string>
 </resources>

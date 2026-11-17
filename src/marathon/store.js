@@ -28,6 +28,8 @@ export const useMarathon = create(persist((set, get) => ({
   dtryx: DEFAULT_DTRYX,
   tmdbKey: '',
   onlyRecent: false,         // 최근 2주 안 개봉작만
+  pinned: [],                // 고정한 극장 theaterId (비어 있으면 전체)
+  mode: 'film',              // film | time
 
   /* 데이터 */
   sessions: [],
@@ -45,6 +47,7 @@ export const useMarathon = create(persist((set, get) => ({
   dates: () => { const s = get(); return Array.from({ length: s.days }, (_, i) => addDays(s.start, i)) },
   windowsOf: d => get().windows[d] || defaultWindows(d),
   setWindows: (d, w) => set(s => ({ windows: { ...s.windows, [d]: w } })),
+  togglePin: id => set(s => ({ pinned: s.pinned.includes(id) ? s.pinned.filter(x => x !== id) : [...s.pinned, id] })),
   toggleHidden: key => set(s => ({ hidden: s.hidden.includes(key) ? s.hidden.filter(k => k !== key) : [...s.hidden, key] })),
   addCart: sess => set(s => ({ cart: s.cart.some(c => c.id === sess.id) ? s.cart : [...s.cart, sess] })),
   removeCart: id => set(s => ({ cart: s.cart.filter(c => c.id !== id) })),

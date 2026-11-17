@@ -1,6 +1,7 @@
 import { useState, lazy, Suspense } from 'react'
 import { motion, AnimatePresence, MotionConfig } from 'framer-motion'
-import App, { TicketForm } from './App.jsx'
+import Records from './rate/Records.jsx'
+import RateSheet from './rate/RateSheet.jsx'
 import Planner from './marathon/Planner.jsx'
 import { useMarathon } from './marathon/store.js'
 import './marathon/marathon.css'
@@ -30,7 +31,7 @@ export default function Root() {
       <div className={`root-shell tab-${tab}`}>
         <main className="root-pane">
           {tab === 'plan' && <Planner onRate={openRate} />}
-          {tab === 'rate' && <App />}
+          {tab === 'rate' && <Records />}
           <Suspense fallback={<div className="mm-empty center">불러오는 중...</div>}>
             {tab === 'report' && <Summary onRate={openRate} />}
             {tab === 'set' && <Settings />}
@@ -48,16 +49,12 @@ export default function Root() {
 
         <AnimatePresence>
           {rating && (
-            <motion.div className="mm-rate" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <div className="mm-rate-bar"><span className="mm-lbl">RATE</span><b>{rating.title}</b><button className="mm-btn ghost sm" onClick={() => setRating(null)}>닫기</button></div>
-              <div className="screen-surface ticket-screen mm-rate-body">
-                <TicketForm
-                  initial={{ title: rating.title, watchedDate: rating.date, watchedPlace: rating.theater }}
-                  onClose={() => setRating(null)}
-                  onSave={onSaved}
-                />
-              </div>
-            </motion.div>
+            <RateSheet
+              query={rating.title}
+              initial={{ watchedDate: rating.date, watchedPlace: rating.theater }}
+              onClose={() => setRating(null)}
+              onSaved={onSaved}
+            />
           )}
         </AnimatePresence>
       </div>

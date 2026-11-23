@@ -28,6 +28,9 @@ export function cleanTitle(raw) {
 }
 export const titleKey = t => cleanTitle(t).replace(/[\s:·\-–—()[\]'"!?.,]/g, '').toLowerCase()
 
+/** 좌석 수: 숫자가 아니면 null */
+const seat = v => { const n = Number(v); return v === '' || v == null || !Number.isFinite(n) || n < 0 ? null : n }
+
 async function getJson(url, opts = {}) {
   const r = await fetch(url, { ...opts, headers: { ...UA_HEADERS, ...(opts.headers || {}) } })
   if (!r.ok) throw new Error(`${r.status}`)
@@ -53,6 +56,7 @@ async function cgv(t, date) {
   return (j.data || []).map(x => ({
     title: cleanTitle(x.prodNm).replace(/^(.+?)-(.+)$/, '$1: $2'),
     st: toMin(x.scnsrtTm), en: toMin(x.scnendTm),
+    left: seat(x.frSeatCnt ?? x.frtmpSeatCnt), total: seat(x.stcnt),
     fmt: x.movkndDsplNm && x.movkndDsplNm !== '2D' ? x.movkndDsplNm.replace(' 2D', '').replace('LASER', '').trim() : '',
   }))
 }
@@ -67,6 +71,7 @@ async function mega(t, date) {
   return (j.megaMap?.movieFormList || []).map(x => ({
     title: cleanTitle(x.movieNm),
     st: toMin(x.playStartTime), en: toMin(x.playEndTime),
+    left: seat(x.restSeatCnt), total: seat(x.totSeatCnt),
     fmt: /자막|더빙|2D/.test(x.playKindNm || '') && !/IMAX|4DX|DOLBY|MX/i.test(x.playKindNm) ? '' : cleanTitle(x.playKindNm || ''),
   }))
 }
@@ -91,21 +96,39 @@ async function cineq(t, date) {
       if (!start) return
       let st = toMin(start), en = end ? toMin(end) : null
       if (en !== null && en < st) en += 1440
-      out.push({ title, st, en, fmt: '' })
+      // 잔여석: '23/120' 또는 '23석' 꼴이 있으면 읽어요 (없으면 표시 안 함)
+      const rest = a.textContent.replace(/\d{1,2}:\d{2}/g, '')
+      const m2 = rest.match(/(\d+)\s*\/\s*(\d+)/) || rest.match(/(\d+)\s*석/)
+      out.push({ title, st, en, fmt: '', left: m2 ? seat(m2[1]) : null, total: m2?.[2] ? seat(m2[2]) : null })
     })
   })
   return out
 }
 
-/* ── 디트릭스 (독립영화관) ─────────────────── */
+/* ── 디트릭스 (독립·예술영화관) ─────────────── */
+// 극장 홈페이지들이 쓰는 공개 조회 주소. WorkGuID는 극장 홈페이지에 공개된 고정값이에요.
+const DTRYX_TT = 'https://api.dtryx.com/dtryx/cms/thirdparty/movie/third-party-type2-timetable-list'
+const DTRYX_WORK = '37E0BA0F-DA5F-4376-9BA4-B5D27286AB87'
+const dtryxRow = x => {
+  const st = toMin(x.StartTime); let en = x.EndTime ? toMin(x.EndTime) : null; if (en != null && en < st) en += 1440
+  return {
+    title: cleanTitle(x.MovieNm), st, en,
+    left: seat(x.RemainSeatCnt), total: seat(x.TotalSeatCnt),
+    fmt: /애트머스|ATMOS/i.test(x.ScreenTypeNm || '') ? 'ATMOS' : '',
+  }
+}
 async function dtryx(t, date) {
-  const j = await getJson(
-    `https://www.dtryx.com/cinema/showseq_list.do?cgid=${t.cgid}&ssid=&tokn=&BrandCd=${t.brand}&CinemaCd=${t.code}&PlaySDT=${ymd(date, '-')}&_=${Date.now()}`,
-  )
-  return (j.Showseqlist || []).map(x => {
-    const st = toMin(x.StartTime); let en = toMin(x.EndTime); if (en < st) en += 1440
-    return { title: cleanTitle(x.MovieNm), st, en, fmt: /애트머스|ATMOS/i.test(x.ScreenTypeNm || '') ? 'ATMOS' : '' }
-  })
+  try {
+    const q = new URLSearchParams({ ChannelCd: 'homepage', EngVerYn: 'N', WorkGuID: DTRYX_WORK, BrandCd: t.brand, CinemaCd: t.code, PlaySDT: ymd(date, '-'), ImgSize: 'small' })
+    const j = await getJson(`${DTRYX_TT}?${q}`)
+    if (j.RetCode !== 'success' || !Array.isArray(j.Recordset)) throw new Error('dtryx')
+    return j.Recordset.filter(x => x.MovieNm && x.StartTime).map(dtryxRow)
+  } catch (e) {
+    if (!t.cgid) throw e
+    // 예전 주소(라이카 홈페이지용)로 한 번 더
+    const j = await getJson(`https://www.dtryx.com/cinema/showseq_list.do?cgid=${t.cgid}&ssid=&tokn=&BrandCd=${t.brand}&CinemaCd=${t.code}&PlaySDT=${ymd(date, '-')}&_=${Date.now()}`)
+    return (j.Showseqlist || []).map(dtryxRow)
+  }
 }
 
 const FETCHERS = { cgv, mega, cineq, dtryx }
@@ -122,23 +145,31 @@ export async function fetchTheaterDay(t, date) {
       theaterId: t.id, theater: t.name, area: t.area || '', chain: t.chain,
       url: BOOKING_URL[t.chain](t),
       date: d, st: r.st, en: r.en ?? null, fmt: r.fmt || '',
+      left: r.left ?? null, total: r.total ?? null,
     }))
 }
 
-/** 여러 극장 × 여러 날짜를 동시에 4개씩 불러오기 */
-export async function fetchAll(theaters, dates, onProgress) {
-  const jobs = []
-  theaters.forEach(t => dates.forEach(d => jobs.push([t, d])))
-  const results = [], errors = []
-  let done = 0, i = 0
+const wait = ms => new Promise(r => setTimeout(r, ms))
+
+/**
+ * 하루치를 극장마다 불러와요. CGV는 한꺼번에 많이 부르면 막혀서, 동시에 3개씩 + 실패하면 두 번 더 시도해요.
+ * 반환: { ok: Map(theaterId → sessions), failed: [극장 이름] }
+ */
+export async function fetchDay(theaters, date, onProgress) {
+  const dt = new Date(date + 'T00:00:00')
+  const ok = new Map(), failed = []
+  let i = 0, done = 0
   async function worker() {
-    while (i < jobs.length) {
-      const [t, d] = jobs[i++]
-      try { results.push(...await fetchTheaterDay(t, d)) }
-      catch { errors.push(`${t.name} ${ymd(d, '-')}`) }
-      onProgress?.(++done, jobs.length)
+    while (i < theaters.length) {
+      const t = theaters[i++]
+      let got = null
+      for (let a = 0; a < 3 && !got; a++) {
+        try { got = await fetchTheaterDay(t, dt) } catch { if (a < 2) await wait(700 * (a + 1)) }
+      }
+      if (got) ok.set(t.id, got); else failed.push(t.name)
+      onProgress?.(++done, theaters.length)
     }
   }
-  await Promise.all(Array.from({ length: 4 }, worker))
-  return { sessions: results, errors }
+  await Promise.all(Array.from({ length: 3 }, worker))
+  return { ok, failed }
 }
